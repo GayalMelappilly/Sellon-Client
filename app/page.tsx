@@ -1,11 +1,10 @@
-import SignupForm from "./components/signup/SignupForm";
-import SignupPopup from "./components/signup/SignupPopup";
-
+import Header from "./components/Header/Header";
 
 export default function Home() {
+  
   return (
     <div>
-      <SignupPopup/>
+      <Header />
     </div>
   );
 }

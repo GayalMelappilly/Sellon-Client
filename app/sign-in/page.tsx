@@ -6,6 +6,7 @@ import { LoginFormDataPayload } from '../payload/payload';
 import { useMutation } from '@tanstack/react-query';
 import { LoginUser } from '@/api/users/action';
 import { useRouter } from 'next/navigation';
+import { setLocalStorage } from '../utils/localStorage';
 
 type Props = {}
 
@@ -20,7 +21,10 @@ const Page = (props: Props) => {
 
   const mutation = useMutation({
     mutationFn: LoginUser,
-    onSuccess: ()=>{
+    onSuccess: (data)=>{
+      console.log('User logged in successfully', data)
+      const accessToken = data.accessToken
+      setLocalStorage('access_token', accessToken)
       router.push("/")
     },
     onError: (err)=>{
