@@ -6,28 +6,53 @@ import React, { useState, ChangeEvent, FC } from 'react';
 type Props = {
     formData: FormDataPayload,
     setFormData: (formData: FormDataPayload) => void,
-    handleSubmit: (e:React.FormEvent) => void
+    handleSubmit: (e: React.FormEvent) => void
 }
 
-const SignupForm:FC<Props> = ({formData, setFormData, handleSubmit}) => {
+const SignupForm: FC<Props> = ({ formData, setFormData, handleSubmit }) => {
 
     const [showPassword, setShowPassword] = useState<boolean>(false)
+    const [image, setImage] = useState<string>()
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        console.log(e.target.value)
         setFormData({
-          ...formData,
-          [e.target.name]: e.target.value
-        });
-      };
-    
-      const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-          setFormData({
             ...formData,
-            avatar: e.target.files[0].name
-          });
-        }
-      };
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log("CLICKED")
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = async () => {
+            const base64Image = reader.result as string;
+            try {
+                const response = await fetch('/api/image-upload/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: base64Image }),
+                });
+                console.log("CLOUDINARY ", response)
+
+                const data = await response.json();
+                console.log("DATA CLOUD : ",data)
+                if (data.url) {
+                    console.log("IMAGE URL : ", data.url)
+                    setFormData({
+                        ...formData,
+                        avatar: data.url as string
+                    });
+                }
+            } catch (error) {
+                console.error('Error uploading image:', error);
+            }
+        };
+    };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -107,7 +132,7 @@ const SignupForm:FC<Props> = ({formData, setFormData, handleSubmit}) => {
                         />
                         <div className='flex justify-between'>
                             <p className="mt-1 text-xs text-gray-500">Password must be at least 8 characters long</p>
-                            <p className="mt-1 text-xs text-gray-500 cursor-pointer" onClick={()=>setShowPassword(!showPassword)}>{showPassword ? 'Hide' : 'Show'}</p>
+                            <p className="mt-1 text-xs text-gray-500 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>{showPassword ? 'Hide' : 'Show'}</p>
                         </div>
                     </div>
 
@@ -155,9 +180,15 @@ const SignupForm:FC<Props> = ({formData, setFormData, handleSubmit}) => {
                             id="avatar"
                             name="avatar"
                             type="file"
-                            accept="image/*"
                             className="relative block w-full px-3 py-2 mt-1 text-gray-900 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            onChange={handleFileChange}
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    console.log('File selected:', file);
+                                    // setLoading(true)
+                                    handleImageUpload(e)
+                                }
+                            }}
                         />
                         <p className="mt-1 text-xs text-gray-500">Upload a profile picture (optional)</p>
                     </div>

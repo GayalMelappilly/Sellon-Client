@@ -1,13 +1,11 @@
 'use client'
 
-import React, { ChangeEvent, useState } from 'react'
+import React, { useState } from 'react'
 import SignupForm from '../components/signup/SignupForm'
 import { FormDataPayload } from '../payload/payload'
 import { useMutation } from '@tanstack/react-query'
-import { signUpUser } from '@/api/users/action'
+import { signUpUser } from '@/pages/api/users/action'
 import { useRouter } from 'next/navigation'
-
-
 
 type Props = {}
 
@@ -23,7 +21,7 @@ const Page = (props: Props) => {
     phone_number: '',
     role: 'customer',
     address: '',
-    avatar: 'sample.png',
+    avatar: '',
     status: 'active'
   });
 

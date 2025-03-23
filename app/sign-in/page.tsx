@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import LoginForm from '../components/login/LoginForm'
 import { LoginFormDataPayload } from '../payload/payload';
 import { useMutation } from '@tanstack/react-query';
-import { LoginUser } from '@/api/users/action';
+import { LoginUser } from '@/pages/api/users/action';
 import { useRouter } from 'next/navigation';
 import { setLocalStorage } from '../utils/localStorage';
 
