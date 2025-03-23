@@ -56,6 +56,5 @@ export const getCurrentUser = async (accessToken: string) => {
     if (!res.ok) {
         throw new Error('Failed to fetch current user')
     }
-    const userData = await res.json()
-    return userData
+    return res.json()
 }

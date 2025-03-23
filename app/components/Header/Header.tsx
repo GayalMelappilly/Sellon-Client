@@ -6,12 +6,14 @@ import { useQuery } from '@tanstack/react-query'
 import { Search, ShoppingCart, User, Heart, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
+import Image from 'next/image';
+import { FormDataPayload } from '@/app/payload/payload';
 
 type Props = {}
 
 const Header = (props: Props) => {
 
-    const [username, setUsername] = useState<string>("SAMPLE")
+    const [user, setUser] = useState<FormDataPayload>()
     const [token, setToken] = useState<string>("")
     const [isMenuOpen, setIsMenuOpen] = useState(false);
   
@@ -25,11 +27,21 @@ const Header = (props: Props) => {
     }, [])
 
     const { data, isLoading, isError } = useQuery({
-        queryKey: ['current-user'],
+        queryKey: ['current-user', token],
         queryFn: () => getCurrentUser(token),
+        enabled: !!token
     })
+
+    useEffect(()=>{
+        if(data && data.data){
+            console.log(data.data)
+            setUser(data.data)
+        }
+    },[data])
+
     if (isError) return <>Error while fetching current user</>
     if (isLoading) return <>Loading...</>
+
 
     return (
         <>
@@ -82,7 +94,7 @@ const Header = (props: Props) => {
                                 <Heart className="h-6 w-6" />
                             </Link>
                             <Link href="#" className="text-gray-500 hover:text-gray-900 mx-2">
-                                <User className="h-6 w-6" />
+                                {user ? <Image className='rounded-md' alt='' src={user.avatar as string} width={30} height={30} /> : <User className="h-6 w-6" />}
                             </Link>
                             <Link href="#" className="text-gray-500 hover:text-gray-900 mx-2 relative">
                                 <ShoppingCart className="h-6 w-6" />

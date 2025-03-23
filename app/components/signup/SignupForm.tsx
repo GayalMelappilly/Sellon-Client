@@ -12,7 +12,7 @@ type Props = {
 const SignupForm: FC<Props> = ({ formData, setFormData, handleSubmit }) => {
 
     const [showPassword, setShowPassword] = useState<boolean>(false)
-    const [image, setImage] = useState<string>()
+    const [uploading, setUploading] = useState<boolean>(false)
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         console.log(e.target.value)
@@ -26,7 +26,7 @@ const SignupForm: FC<Props> = ({ formData, setFormData, handleSubmit }) => {
         console.log("CLICKED")
         const file = e.target.files?.[0];
         if (!file) return;
-
+        setUploading(true)
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onloadend = async () => {
@@ -40,7 +40,7 @@ const SignupForm: FC<Props> = ({ formData, setFormData, handleSubmit }) => {
                 console.log("CLOUDINARY ", response)
 
                 const data = await response.json();
-                console.log("DATA CLOUD : ",data)
+                console.log("DATA CLOUD : ", data)
                 if (data.url) {
                     console.log("IMAGE URL : ", data.url)
                     setFormData({
@@ -48,8 +48,10 @@ const SignupForm: FC<Props> = ({ formData, setFormData, handleSubmit }) => {
                         avatar: data.url as string
                     });
                 }
+                setUploading(false)
             } catch (error) {
                 console.error('Error uploading image:', error);
+                setUploading(false)
             }
         };
     };
@@ -190,7 +192,13 @@ const SignupForm: FC<Props> = ({ formData, setFormData, handleSubmit }) => {
                                 }
                             }}
                         />
-                        <p className="mt-1 text-xs text-gray-500">Upload a profile picture (optional)</p>
+                        <div className='flex justify-between'>
+                            <p className="mt-1 text-xs text-gray-500">Upload a profile picture (optional)</p>
+                            {uploading && (
+                                <p className="mt-1 text-xs text-gray-500">Uploading...</p>
+                            )}
+                        </div>
+
                     </div>
 
                     <input type="hidden" name="status" value={formData.status} />
@@ -198,7 +206,7 @@ const SignupForm: FC<Props> = ({ formData, setFormData, handleSubmit }) => {
                     <div>
                         <button
                             type="submit"
-                            className="group relative flex w-full justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            className={`group relative flex w-full justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${uploading ? 'bg-gray-500 pointer-events-none' : 'bg-blue-600 hover:bg-blue-700 pointer-events-auto'}  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                         >
                             Create Account
                         </button>
